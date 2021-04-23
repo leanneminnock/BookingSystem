@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookingSystem.Data;
 using BookingSystem.Data.Entities;
+using BookingSystem.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,19 +22,19 @@ namespace BookingSystem.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult<IEnumerable<Room>> GetAllRooms()
+        public ActionResult<IEnumerable<RoomViewModel>> GetAllRooms()
         {
             var rooms = _repo.GetAllRooms();
-            return Ok(_mapper.Map<IEnumerable<Room>>(rooms));
+            return Ok(_mapper.Map<IEnumerable<RoomViewModel>>(rooms));
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Room> GetRoomById(int id)
+        public ActionResult<RoomViewModel> GetRoomById(int id)
         {
             try
             {
                 var room = _repo.GetRoomById(id);
-                return Ok(_mapper.Map<Room>(room));
+                return Ok(_mapper.Map<RoomViewModel>(room));
             }
             catch (ArgumentException ex)
             {
@@ -42,13 +43,13 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Room> CreateRoom([FromBody] Room room)
+        public ActionResult<RoomViewModel> CreateRoom([FromBody] Room room)
         {
             if (ModelState.IsValid)
             {
                 _repo.CreateNewRoom(room);
                 if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<Room>(room));
+                return Ok(_mapper.Map<RoomViewModel>(room));
             }
             else
             {
@@ -57,12 +58,12 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPut]
-        public ActionResult<Room> UpdateRoom([FromBody] Room room)
+        public ActionResult<RoomViewModel> UpdateRoom([FromBody] Room room)
         {
             if (!_repo.UpdateRoom(room)) { return BadRequest(); }
 
             if (!_repo.SaveAll()) { return BadRequest(); }
-            return Ok(_mapper.Map<Room>(room));
+            return Ok(_mapper.Map<RoomViewModel>(room));
         }
 
         [HttpDelete]

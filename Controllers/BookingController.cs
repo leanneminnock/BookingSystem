@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookingSystem.Data;
 using BookingSystem.Data.Entities;
+using BookingSystem.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,20 +22,20 @@ namespace BookingSystem.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult<IEnumerable<Booking>> GetAllBookings()
+        public ActionResult<IEnumerable<BookingViewModel>> GetAllBookings()
         {
             var bookings = _repo.GetAllBookings();
-            return Ok(_mapper.Map<IEnumerable<Booking>>(bookings));
+            return Ok(_mapper.Map<IEnumerable<BookingViewModel>>(bookings));
 
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Booking> GetBookingById(int id)
+        public ActionResult<BookingViewModel> GetBookingById(int id)
         {
             try
             {
                 var booking = _repo.GetBookingById(id);
-                return Ok(_mapper.Map<Booking>(booking));
+                return Ok(_mapper.Map<BookingViewModel>(booking));
             }
             catch (ArgumentException ex)
             {
@@ -43,12 +44,12 @@ namespace BookingSystem.Controllers
         }
 
         [HttpGet("{id}/Booking")]
-        public ActionResult<Booking> GetBookingByCustomerId(int id)
+        public ActionResult<BookingViewModel> GetBookingByCustomerId(int id)
         {
             try
             {
                 var booking = _repo.GetBookingsByCustomerId(id);
-                return Ok(_mapper.Map<Booking>(booking));
+                return Ok(_mapper.Map<BookingViewModel>(booking));
             }
             catch (ArgumentException ex)
             {
@@ -57,12 +58,12 @@ namespace BookingSystem.Controllers
         }
         
         [HttpGet("{id}/Hotel")] // I know this is wrong but not sure what it should be
-        public ActionResult<Booking> GetBookingsByHotelId(int id)
+        public ActionResult<BookingViewModel> GetBookingsByHotelId(int id)
         {
             try
             {
                 var booking = _repo.GetBookingsByHotelId(id);
-                return Ok(_mapper.Map<Booking>(booking));
+                return Ok(_mapper.Map<BookingViewModel>(booking));
             }
             catch (ArgumentException ex)
             {

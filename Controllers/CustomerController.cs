@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookingSystem.Data;
 using BookingSystem.Data.Entities;
+using BookingSystem.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -21,19 +22,19 @@ namespace BookingSystem.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult<IEnumerable<Customer>> GetAllCustomers()
+        public ActionResult<IEnumerable<CustomerViewModel>> GetAllCustomers()
         {
             var customers = _repo.GetAllCustomers();
-            return Ok(_mapper.Map<IEnumerable<Customer>>(customers));
+            return Ok(_mapper.Map<IEnumerable<CustomerViewModel>>(customers));
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Customer> GetCustomerById(int id)
+        public ActionResult<CustomerViewModel> GetCustomerById(int id)
         {
             try
             {
                 var customer = _repo.GetCustomerById(id);
-                return Ok(_mapper.Map<Customer>(customer));
+                return Ok(_mapper.Map<CustomerViewModel>(customer));
             }
             catch (ArgumentException ex)
             {
@@ -42,13 +43,13 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPost]
-        public ActionResult<Customer> CreateCustomer([FromBody] Customer customer)
+        public ActionResult<CustomerViewModel> CreateCustomer([FromBody] Customer customer)
         {
             if (ModelState.IsValid)
             {
                 _repo.CreateNewCustomer(customer);
                 if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<Customer>(customer));
+                return Ok(_mapper.Map<CustomerViewModel>(customer));
             }
             else
             {
@@ -57,12 +58,12 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPut]
-        public ActionResult<Customer> UpdateCustomer([FromBody] Customer customer)
+        public ActionResult<CustomerViewModel> UpdateCustomer([FromBody] Customer customer)
         {
             if (!_repo.UpdateCustomer(customer)) { return BadRequest(); }
 
             if (!_repo.SaveAll()) { return BadRequest(); }
-            return Ok(_mapper.Map<Customer>(customer));
+            return Ok(_mapper.Map<CustomerViewModel>(customer));
         }
 
         [HttpDelete]

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BookingSystem.Data;
 using BookingSystem.Data.Entities;
+using BookingSystem.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -24,19 +25,19 @@ namespace BookingSystem.Controllers
             _mapper = mapper;
         }
 
-        public ActionResult<IEnumerable<Hotel>> GetAllHotels()
+        public ActionResult<IEnumerable<HotelViewModel>> GetAllHotels()
         {
             var hotels = _repo.GetHotels();
-            return Ok(_mapper.Map<IEnumerable<Hotel>>(hotels));
+            return Ok(_mapper.Map<IEnumerable<HotelViewModel>>(hotels));
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Hotel> GetHotelById(int id)
+        public ActionResult<HotelViewModel> GetHotelById(int id)
         {
             try
             {
                 var hotel = _repo.GetHotelById(id);
-                return Ok(_mapper.Map<Hotel>(hotel));
+                return Ok(_mapper.Map<HotelViewModel>(hotel));
             }
             catch (ArgumentException ex)
             {
@@ -45,12 +46,12 @@ namespace BookingSystem.Controllers
         }
 
         [HttpGet("{id}/rooms")]
-        public ActionResult<IEnumerable<Room>> GetRoomsByHotelId(int id)
+        public ActionResult<IEnumerable<RoomViewModel>> GetRoomsByHotelId(int id)
         {
             try
             {
                 var rooms = _repo.GetRoomsByHotelId(id);
-                return Ok(_mapper.Map<IEnumerable<Room>>(rooms));
+                return Ok(_mapper.Map<IEnumerable<RoomViewModel>>(rooms));
             }
             catch(ArgumentException ex)
             {
@@ -59,13 +60,13 @@ namespace BookingSystem.Controllers
         }
         
         [HttpPost]
-        public ActionResult<Hotel> CreateHotel([FromBody]Hotel hotel)
+        public ActionResult<HotelViewModel> CreateHotel([FromBody]Hotel hotel)
         { 
             if (ModelState.IsValid)
             {
                 _repo.CreateNewHotel(hotel);
                 if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<Hotel>(hotel));
+                return Ok(_mapper.Map<HotelViewModel>(hotel));
             }
             else
             {
@@ -74,12 +75,12 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPut]
-        public ActionResult<Hotel> UpdateHotel([FromBody] Hotel hotel)
+        public ActionResult<HotelViewModel> UpdateHotel([FromBody] Hotel hotel)
         {
             if (!_repo.UpdateHotel(hotel)) { return BadRequest(); } 
 
             if (!_repo.SaveAll()) { return BadRequest(); } 
-            return Ok(_mapper.Map<Hotel>(hotel));
+            return Ok(_mapper.Map<HotelViewModel>(hotel));
         }
 
         [HttpDelete]
