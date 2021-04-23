@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 
 namespace BookingSystem.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class BookingController : Controller
     {
         private readonly IBookingRepository _repo;
