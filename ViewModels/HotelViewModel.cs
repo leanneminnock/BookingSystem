@@ -12,7 +12,7 @@ namespace BookingSystem.ViewModels
         public int Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
-        public List<Room> Rooms { get; set; }
-        public List<Booking> Bookings { get; set; }
+        public List<RoomViewModel> Rooms { get; set; }
+        public List<BookingViewModel> Bookings { get; set; }
     }
 }

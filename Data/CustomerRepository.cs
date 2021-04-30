@@ -24,12 +24,21 @@ namespace BookingSystem.Data
             {
                 customers.Add(c);
             }
+            if(customers == null)
+            {
+                throw new NullReferenceException();
+            }
             return customers; 
         }
 
         public Customer GetCustomerById(int Id)
         {
-            return _ctx.Customers.FirstOrDefault(c => c.Id == Id);
+            Customer customer = _ctx.Customers.FirstOrDefault(c => c.Id == Id);
+            if(customer == null)
+            {
+                throw new ArgumentException();
+            }
+            return customer;
         }
 
         public void CreateNewCustomer(Customer customer)
@@ -42,7 +51,7 @@ namespace BookingSystem.Data
             Customer currentCustomer = GetCustomerById(updateCustomer.Id);
             if (currentCustomer == null)
             {
-                return false;
+               throw new ArgumentException();
             }
             _ctx.Customers.Remove(currentCustomer);
             _ctx.Customers.Add(updateCustomer);
@@ -54,7 +63,7 @@ namespace BookingSystem.Data
             Customer customer = GetCustomerById(id);
             if(customer == null)
             {
-                return false;
+                throw new ArgumentException();
             }
             _ctx.Customers.Remove(customer);
             return true;

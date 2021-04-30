@@ -14,6 +14,6 @@ namespace BookingSystem.ViewModels
         public int RoomNo { get; set; }
         public double Price { get; set; }
         public RoomType RoomType { get; set; }
-        public List<Booking> Bookings { get; set; }
+        public List<BookingViewModel> Bookings { get; set; }
     }
 }

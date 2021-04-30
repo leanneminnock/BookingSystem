@@ -24,19 +24,27 @@ namespace BookingSystem.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public ActionResult<IEnumerable<BookingViewModel>> GetAllBookings()
         {
             var bookings = _repo.GetAllBookings();
-            return Ok(_mapper.Map<IEnumerable<BookingViewModel>>(bookings));
+            try
+            {
+                return Ok(_mapper.Map<IEnumerable<BookingViewModel>>(bookings));
+            }
+            catch(NullReferenceException ex)
+            {
+                return BadRequest($"Could not fetch bookings {ex}");
+            }
 
         }
 
         [HttpGet("{id}")]
-        public ActionResult<BookingViewModel> GetBookingById(int id)
+        public ActionResult<BookingViewModel> GetBookingById(int id, bool includeItems)
         {
             try
             {
-                var booking = _repo.GetBookingById(id);
+                var booking = _repo.GetBookingById(id, includeItems);
                 return Ok(_mapper.Map<BookingViewModel>(booking));
             }
             catch (ArgumentException ex)
@@ -46,11 +54,11 @@ namespace BookingSystem.Controllers
         }
 
         [HttpGet("{id}/Booking")]
-        public ActionResult<BookingViewModel> GetBookingByCustomerId(int id)
+        public ActionResult<BookingViewModel> GetBookingByCustomerId(int id, bool includeItems)
         {
             try
             {
-                var booking = _repo.GetBookingsByCustomerId(id);
+                var booking = _repo.GetBookingsByCustomerId(id, includeItems);
                 return Ok(_mapper.Map<BookingViewModel>(booking));
             }
             catch (ArgumentException ex)
@@ -60,11 +68,11 @@ namespace BookingSystem.Controllers
         }
         
         [HttpGet("{id}/Hotel")] // I know this is wrong but not sure what it should be
-        public ActionResult<BookingViewModel> GetBookingsByHotelId(int id)
+        public ActionResult<BookingViewModel> GetBookingsByHotelId(int id, bool includeItems)
         {
             try
             {
-                var booking = _repo.GetBookingsByHotelId(id);
+                var booking = _repo.GetBookingsByHotelId(id, includeItems);
                 return Ok(_mapper.Map<BookingViewModel>(booking));
             }
             catch (ArgumentException ex)
@@ -74,11 +82,11 @@ namespace BookingSystem.Controllers
         }
 
         [HttpGet("{id}/Customer")] // I know this is wrong but not sure what it should be
-        public ActionResult<Customer> GetCustomerByBookingId(int id)
+        public ActionResult<Customer> GetCustomerByBookingId(int id, bool includeItems)
         {
             try
             {
-                var customer = _repo.GetCustomerByBookingId(id);
+                var customer = _repo.GetCustomerByBookingId(id, includeItems);
                 return Ok(_mapper.Map<Customer>(customer));
             }
             catch (ArgumentException ex)
@@ -104,19 +112,34 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPut]
-        public ActionResult<Booking> UpdateBooking([FromBody] Booking booking)
+        public ActionResult<Booking> UpdateBooking([FromBody] Booking booking, bool includeItems)
         {
-            if (!_repo.UpdateBooking(booking)) { return BadRequest(); }
-            if (!_repo.SaveAll()) { return BadRequest(); }
-            return Ok(_mapper.Map<Booking>(booking));
+            try
+            {
+                if (!_repo.UpdateBooking(booking, includeItems)) { return BadRequest(); }
+                if (!_repo.SaveAll()) { return BadRequest(); }
+                return Ok(_mapper.Map<Booking>(booking));
+            }
+            catch(ArgumentException ex)
+            {
+                return NotFound($"could not find the requested booking {ex}");
+            }
         }
 
         [HttpDelete]
-        public ActionResult DeleteBookingById(int id)
+        public ActionResult DeleteBookingById(int id, bool includeItems)
         {
-            if (!_repo.DeleteBookingById(id)) { return NotFound("Booking Id Not Valid."); }
-            if (!_repo.SaveAll()) { return BadRequest("Changes could not be saved."); }
-            return Ok("Booking Deleted");
+            try
+            {
+                if (!_repo.DeleteBookingById(id, includeItems)) { return NotFound("Booking Id Not Valid."); }
+                if (!_repo.SaveAll()) { return BadRequest("Changes could not be saved."); }
+                return Ok("Booking Deleted");
+            }
+            catch(ArgumentException ex)
+            {
+                return NotFound($"could not find the requested booking {ex}");
+            }
+            
         }
     }
 }

@@ -18,12 +18,22 @@ namespace BookingSystem.Data
 
         public IEnumerable<Room> GetAllRooms()
         {
-            return _ctx.Rooms;
+            List<Room> rooms = new List<Room>(_ctx.Rooms);
+            if(rooms == null)
+            {
+                throw new NullReferenceException();
+            }
+            return rooms;
         }
 
         public Room GetRoomById(int id)
         {
-            return _ctx.Rooms.FirstOrDefault(r => r.Id == id);
+            Room room = _ctx.Rooms.FirstOrDefault(r => r.Id == id);
+            if(room == null)
+            {
+                throw new ArgumentException();
+            }
+            return room;
         }
         public void CreateNewRoom(Room room)
         {
@@ -33,10 +43,14 @@ namespace BookingSystem.Data
         public bool DeleteRoomById(int id)
         {
             Room currentRoom = GetRoomById(id);
-            if (currentRoom == null) return false;
+            if (currentRoom == null)
+            {
+                throw new ArgumentException();
+            }
             _ctx.Rooms.Remove(currentRoom);
             return true;
         }
+
         public bool SaveAll()
         {
             return _ctx.SaveChanges() > 0;
@@ -45,7 +59,10 @@ namespace BookingSystem.Data
         public bool UpdateRoom(Room updatedRoom)
         {
             Room currentRoom = GetRoomById(updatedRoom.Id);
-            if (currentRoom == null) return false;
+            if (currentRoom == null)
+            {
+                throw new ArgumentException();
+            }
             _ctx.Rooms.Remove(currentRoom);
             _ctx.Rooms.Add(currentRoom);
             return true;

@@ -25,6 +25,7 @@ namespace BookingSystem.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public ActionResult<IEnumerable<HotelViewModel>> GetAllHotels()
         {
             var hotels = _repo.GetHotels();
@@ -41,7 +42,7 @@ namespace BookingSystem.Controllers
             }
             catch (ArgumentException ex)
             {
-                return NotFound($"No hotel matching Id {id}");
+                return NotFound($"No hotel matching Id {id}, {ex}");
             }
         }
 
@@ -55,7 +56,7 @@ namespace BookingSystem.Controllers
             }
             catch(ArgumentException ex)
             {
-                return NotFound($"No hotel matching Id {id}");
+                return NotFound($"No hotel matching Id {id}, {ex}");
             }
         }
         

@@ -10,16 +10,16 @@ namespace BookingSystem.Data
     public interface IBookingRepository
     {
         IEnumerable<Booking> GetAllBookings();
-        Booking GetBookingById(int bookingId);
-        IEnumerable<Booking> GetBookingsByHotelId(int hotelId);
-        IEnumerable<Booking> GetBookingsByCustomerId(int customerId);
+        Booking GetBookingById(int bookingId, bool includeItems);
+        IEnumerable<Booking> GetBookingsByHotelId(int hotelId, bool includeItems);
+        IEnumerable<Booking> GetBookingsByCustomerId(int customerId, bool includeItems);
         
-        Customer GetCustomerByBookingId(int bookingId);
-        Room GetRoomByBookingId(int id);
+        Customer GetCustomerByBookingId(int bookingId, bool includeItems);
+        Room GetRoomByBookingId(int id, bool includeItems);
 
         void CreateNewBooking(Booking booking);
-        bool UpdateBooking(Booking updatedBooking);
+        bool UpdateBooking(Booking updatedBooking, bool includeItems);
         bool SaveAll();
-        bool DeleteBookingById(int id);
+        bool DeleteBookingById(int id, bool includeItems);
     }
 }

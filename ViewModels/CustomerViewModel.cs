@@ -13,7 +13,7 @@ namespace BookingSystem.ViewModels
         public string Name { get; set; }
         public string Email { get; set; }
         public long Phone { get; set; }
-        public List<Booking> Bookings { get; set; }
+        public List<BookingViewModel> Bookings { get; set; }
 
     }
 }

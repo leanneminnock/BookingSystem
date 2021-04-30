@@ -24,10 +24,18 @@ namespace BookingSystem.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public ActionResult<IEnumerable<RoomViewModel>> GetAllRooms()
         {
-            var rooms = _repo.GetAllRooms();
-            return Ok(_mapper.Map<IEnumerable<RoomViewModel>>(rooms));
+            try
+            {
+                var rooms = _repo.GetAllRooms();
+                return Ok(_mapper.Map<IEnumerable<RoomViewModel>>(rooms));
+            }
+            catch(NullReferenceException ex)
+            {
+                return BadRequest($"Could not fetch all rooms, {ex}");
+            }
         }
 
         [HttpGet("{id}")]
@@ -40,7 +48,7 @@ namespace BookingSystem.Controllers
             }
             catch (ArgumentException ex)
             {
-                return NotFound($"No Room matching Id {id}");
+                return NotFound($"No Room matching Id {id}, {ex}");
             }
         }
 
@@ -62,18 +70,32 @@ namespace BookingSystem.Controllers
         [HttpPut]
         public ActionResult<RoomViewModel> UpdateRoom([FromBody] Room room)
         {
-            if (!_repo.UpdateRoom(room)) { return BadRequest(); }
+            try
+            {
+                if (!_repo.UpdateRoom(room)) { return BadRequest(); }
 
-            if (!_repo.SaveAll()) { return BadRequest(); }
-            return Ok(_mapper.Map<RoomViewModel>(room));
+                if (!_repo.SaveAll()) { return BadRequest(); }
+                return Ok(_mapper.Map<RoomViewModel>(room));
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest($"Could not find room of id {room.Id}, {ex}");
+            }
         }
 
         [HttpDelete]
         public ActionResult DeleteRoomById(int id)
         {
-            if (!_repo.DeleteRoomById(id)) { return NotFound("Room Id Not Valid."); }
-            if (!_repo.SaveAll()) { return BadRequest("Changes could not be saved."); }
-            return Ok("Room Deleted");
+            try
+            {
+                if (!_repo.DeleteRoomById(id)) { return NotFound("Room Id Not Valid."); }
+                if (!_repo.SaveAll()) { return BadRequest("Changes could not be saved."); }
+                return Ok("Room Deleted");
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest($"Could not find room of id {id}, {ex}");
+            }
         }
     }
 }

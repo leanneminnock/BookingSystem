@@ -12,8 +12,8 @@ namespace BookingSystem.ViewModels
         public int Id { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public Room Room { get; set; }
-        public Customer Customer { get; set; }
-        public Hotel Hotel { get; set; }
+        public RoomViewModel Room { get; set; }
+        public CustomerViewModel Customer { get; set; }
+        public HotelViewModel Hotel { get; set; }
     }
 }

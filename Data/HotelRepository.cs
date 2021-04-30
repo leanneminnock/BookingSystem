@@ -18,7 +18,12 @@ namespace BookingSystem.Data
 
         public IEnumerable<Hotel> GetHotels()
         {
-            return _ctx.Hotels;
+            List<Hotel> hotels = new List<Hotel>( _ctx.Hotels);
+            if(hotels == null)
+            {
+                throw new NullReferenceException();
+            }
+            return hotels;
         }
 
         public Hotel GetHotelById(int id)
@@ -49,7 +54,10 @@ namespace BookingSystem.Data
         public bool UpdateHotel(Hotel updatedHotel)
         {
             Hotel currentHotel = GetHotelById(updatedHotel.Id);
-            if (currentHotel == null) return false;
+            if (currentHotel == null)
+            {
+                throw new ArgumentException();
+            }
             _ctx.Hotels.Remove(currentHotel);
             _ctx.Hotels.Add(currentHotel);
             return true;
@@ -59,7 +67,7 @@ namespace BookingSystem.Data
             Hotel hotel = GetHotelById(id);
             if(hotel == null)
             {
-                return false;
+                throw new ArgumentException();
             }
             _ctx.Hotels.Remove(hotel);
             return true;

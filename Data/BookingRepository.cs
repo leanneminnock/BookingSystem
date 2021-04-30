@@ -1,4 +1,5 @@
 ﻿using BookingSystem.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,48 +18,93 @@ namespace BookingSystem.Data
         }
         public IEnumerable<Booking> GetAllBookings()
         {
-            return _ctx.Bookings;
+            List<Booking> bookings = new List<Booking>();
+            bookings.AddRange(_ctx.Bookings.Include(b => b.Room).Include(b => b.Hotel));
+            if (bookings == null)
+            {
+                throw new ArgumentException("Could not fetch all bookings, returned null.");
+            }
+            else
+            {
+                return bookings;
+            }
         }
-        public Booking GetBookingById(int bookingId)
+        public Booking GetBookingById(int bookingId, bool includeItems)
         {
-           return _ctx.Bookings.FirstOrDefault(b => b.Id == bookingId);
-        }
-        public Room GetRoomByBookingId(int id)
-        {
-            Booking booking = GetBookingById(id);
-            return booking.Room;
-        }
-        public IEnumerable<Booking> GetBookingsByCustomerId(int customerId)
-        {
-            return _ctx.Bookings.Where(b => b.Customer.Id == customerId);
+           Booking booking = _ctx.Bookings.FirstOrDefault(b => b.Id == bookingId);
+            if(booking == null)
+            {
+                throw new ArgumentException($"No booking matching the id {bookingId}");
+            }
+            else
+            {
+                return booking;
+            }
         }
 
-        public IEnumerable<Booking> GetBookingsByHotelId(int hotelId)
+        public Room GetRoomByBookingId(int bookingId, bool includeItems)
         {
-            return _ctx.Bookings.Where(b => b.Hotel.Id == hotelId);
+            Booking booking = GetBookingById(bookingId, includeItems);
+            if (booking == null)
+            {
+                throw new ArgumentException($"No booking matching the id {bookingId}");
+            }
+            else
+            {
+                return booking.Room;
+            }
         }
 
-        
-        public Customer GetCustomerByBookingId(int bookingId)
+        public IEnumerable<Booking> GetBookingsByCustomerId(int customerId, bool includeItems)
         {
-            Booking b = GetBookingById(bookingId);
+            List<Booking> bookings = new List<Booking>(_ctx.Bookings.Where(b => b.Customer.Id == customerId));
+            if (bookings == null)
+            {
+                throw new ArgumentException($"Could not fetch bookings for given customer {customerId}, returned null.");
+            }
+            else
+            {
+                return bookings;
+            }
+        }
+
+        public IEnumerable<Booking> GetBookingsByHotelId(int hotelId, bool includeItems)
+        {
+            List<Booking> bookings = new List<Booking>(_ctx.Bookings.Where(b => b.Hotel.Id == hotelId));
+            if (bookings == null)
+            {
+                throw new ArgumentException($"Could not fetch bookings for the Hotel {hotelId}, returned null.");
+            }
+            else
+            {
+                return bookings;
+            }
+        }
+
+        public Customer GetCustomerByBookingId(int bookingId, bool includeItems)
+        {
+            Booking b = GetBookingById(bookingId, includeItems);
             if (b == null)
             {
-                return null;
+                throw new ArgumentException($"Could not fetch Customer for the given booking Id{bookingId}, returned null.");
             }
-            return b.Customer;
+            else
+            {
+                return b.Customer;
+            }
         }
+
         public void CreateNewBooking(Booking newBooking)
         {
             _ctx.Bookings.Add(newBooking);
         }
 
-        public bool DeleteBookingById(int id)
+        public bool DeleteBookingById(int bookingId, bool includeItems)
         {
-            Booking booking = GetBookingById(id);
+            Booking booking = GetBookingById(bookingId, includeItems);
             if (booking == null)
             {
-                return false;
+                throw new ArgumentException($"Could not fetch Booking for the given booking Id{bookingId}, returned null.");
             }
             _ctx.Bookings.Remove(booking);
             return true;
@@ -70,16 +116,20 @@ namespace BookingSystem.Data
         }
 
        
-        public bool UpdateBooking(Booking updateBooking)
+        public bool UpdateBooking(Booking updateBooking, bool includeItems)
         {
-            Booking currentBooking = GetBookingById(updateBooking.Id);
+            Booking currentBooking = GetBookingById(updateBooking.Id, includeItems);
             if (currentBooking == null)
             {
-                return false;
+                throw new NullReferenceException($"Could not update Booking at Id{updateBooking.Id}, returned null.");
             }
-            _ctx.Bookings.Remove(currentBooking);
-            _ctx.Bookings.Add(updateBooking);
-            return true;
+            else
+            {
+                _ctx.Bookings.Remove(currentBooking);
+                _ctx.Bookings.Add(updateBooking);
+                return true;
+            }
+           
         }
 
     }

@@ -24,10 +24,18 @@ namespace BookingSystem.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet]
         public ActionResult<IEnumerable<CustomerViewModel>> GetAllCustomers()
         {
             var customers = _repo.GetAllCustomers();
-            return Ok(_mapper.Map<IEnumerable<CustomerViewModel>>(customers));
+            try
+            {
+                return Ok(_mapper.Map<IEnumerable<CustomerViewModel>>(customers));
+            }
+            catch(NullReferenceException ex)
+            {
+                return BadRequest($"Could not fetch all customers, {ex}");
+            }
         }
 
         [HttpGet("{id}")]
@@ -40,40 +48,61 @@ namespace BookingSystem.Controllers
             }
             catch (ArgumentException ex)
             {
-                return NotFound($"No customer matching Id {id}");
+                return NotFound($"No customer matching Id {id}, {ex}");
             }
         }
 
         [HttpPost]
         public ActionResult<CustomerViewModel> CreateCustomer([FromBody] Customer customer)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _repo.CreateNewCustomer(customer);
-                if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<CustomerViewModel>(customer));
+                if (ModelState.IsValid)
+                {
+                    _repo.CreateNewCustomer(customer);
+                    if (!_repo.SaveAll()) { return BadRequest(); }
+                    return Ok(_mapper.Map<CustomerViewModel>(customer));
+                }
+                else
+                {
+                    return BadRequest(ModelState);
+                }
             }
-            else
+            catch(ArgumentException ex)
             {
-                return BadRequest(ModelState);
+                return BadRequest($"No valid customer found {ex}");
             }
         }
 
         [HttpPut]
         public ActionResult<CustomerViewModel> UpdateCustomer([FromBody] Customer customer)
         {
-            if (!_repo.UpdateCustomer(customer)) { return BadRequest(); }
+            try
+            {
+                if (!_repo.UpdateCustomer(customer)) { return BadRequest(); }
 
-            if (!_repo.SaveAll()) { return BadRequest(); }
-            return Ok(_mapper.Map<CustomerViewModel>(customer));
+                if (!_repo.SaveAll()) { return BadRequest(); }
+                return Ok(_mapper.Map<CustomerViewModel>(customer));
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest($"No valid customer could be found, {ex}");
+            }
         }
 
         [HttpDelete]
         public ActionResult DeleteCustomerById(int id)
         {
-            if (!_repo.DeleteCustomerById(id)) { return NotFound("Customer Id Not Valid."); }
-            if (!_repo.SaveAll()) { return BadRequest("Changes could not be saved."); }
-            return Ok("Customer  Deleted");
+            try
+            {
+                if (!_repo.DeleteCustomerById(id)) { return NotFound("Customer Id Not Valid."); }
+                if (!_repo.SaveAll()) { return BadRequest("Changes could not be saved."); }
+                return Ok("Customer  Deleted");
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest($"No valid customer was found, {ex}");
+            }
         }
 
     }
