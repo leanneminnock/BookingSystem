@@ -61,13 +61,14 @@ namespace BookingSystem.Controllers
         }
         
         [HttpPost]
-        public ActionResult<HotelViewModel> CreateHotel([FromBody]Hotel hotel)
+        public ActionResult<HotelViewModel> CreateHotel([FromBody] HotelViewModel hotel)
         { 
             if (ModelState.IsValid)
             {
-                _repo.CreateNewHotel(hotel);
+                Hotel h = _mapper.Map<Hotel>(hotel);
+                _repo.CreateNewHotel(h);
                 if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<HotelViewModel>(hotel));
+                return Ok(_mapper.Map<HotelViewModel>(h));
             }
             else
             {
@@ -76,12 +77,12 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPut]
-        public ActionResult<HotelViewModel> UpdateHotel([FromBody] Hotel hotel)
+        public ActionResult<HotelViewModel> UpdateHotel([FromBody] HotelViewModel hotel)
         {
-            if (!_repo.UpdateHotel(hotel)) { return BadRequest(); } 
-
+            Hotel h = _mapper.Map<Hotel>(hotel);
+            if (!_repo.UpdateHotel(h)) { return BadRequest(); } 
             if (!_repo.SaveAll()) { return BadRequest(); } 
-            return Ok(_mapper.Map<HotelViewModel>(hotel));
+            return Ok(_mapper.Map<HotelViewModel>(h));
         }
 
         [HttpDelete]

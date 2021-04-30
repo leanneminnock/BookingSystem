@@ -53,15 +53,16 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPost]
-        public ActionResult<CustomerViewModel> CreateCustomer([FromBody] Customer customer)
+        public ActionResult<CustomerViewModel> CreateCustomer([FromBody] CustomerViewModel customer)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    _repo.CreateNewCustomer(customer);
+                    Customer c = _mapper.Map<Customer>(customer);
+                    _repo.CreateNewCustomer(c);
                     if (!_repo.SaveAll()) { return BadRequest(); }
-                    return Ok(_mapper.Map<CustomerViewModel>(customer));
+                    return Ok(_mapper.Map<CustomerViewModel>(c));
                 }
                 else
                 {
@@ -75,14 +76,15 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPut]
-        public ActionResult<CustomerViewModel> UpdateCustomer([FromBody] Customer customer)
+        public ActionResult<CustomerViewModel> UpdateCustomer([FromBody] CustomerViewModel customer)
         {
             try
             {
-                if (!_repo.UpdateCustomer(customer)) { return BadRequest(); }
+                Customer c = _mapper.Map<Customer>(customer);
+                if (!_repo.UpdateCustomer(c)) { return BadRequest(); }
 
                 if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<CustomerViewModel>(customer));
+                return Ok(_mapper.Map<CustomerViewModel>(c));
             }
             catch(ArgumentException ex)
             {

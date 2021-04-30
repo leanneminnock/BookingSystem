@@ -82,12 +82,12 @@ namespace BookingSystem.Controllers
         }
 
         [HttpGet("{id}/Customer")] // I know this is wrong but not sure what it should be
-        public ActionResult<Customer> GetCustomerByBookingId(int id, bool includeItems)
+        public ActionResult<CustomerViewModel> GetCustomerByBookingId(int id, bool includeItems)
         {
             try
             {
                 var customer = _repo.GetCustomerByBookingId(id, includeItems);
-                return Ok(_mapper.Map<Customer>(customer));
+                return Ok(_mapper.Map<CustomerViewModel>(customer));
             }
             catch (ArgumentException ex)
             {
@@ -97,13 +97,14 @@ namespace BookingSystem.Controllers
 
         
         [HttpPost]
-        public ActionResult<Booking> CreateBooking([FromBody] Booking booking)
+        public ActionResult<BookingViewModel> CreateBooking([FromBody] BookingViewModel booking)
         {
             if (ModelState.IsValid)
             {
-                _repo.CreateNewBooking(booking);
+                Booking b = _mapper.Map<Booking>(booking);
+                _repo.CreateNewBooking(b);
                 if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<Booking>(booking));
+                return Ok(_mapper.Map<BookingViewModel>(b));
             }
             else
             {
@@ -112,13 +113,14 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPut]
-        public ActionResult<Booking> UpdateBooking([FromBody] Booking booking, bool includeItems)
+        public ActionResult<BookingViewModel> UpdateBooking([FromBody] BookingViewModel booking, bool includeItems)
         {
             try
             {
-                if (!_repo.UpdateBooking(booking, includeItems)) { return BadRequest(); }
+                Booking b = _mapper.Map<Booking>(booking);
+                if (!_repo.UpdateBooking(b, includeItems)) { return BadRequest(); }
                 if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<Booking>(booking));
+                return Ok(_mapper.Map<BookingViewModel>(b));
             }
             catch(ArgumentException ex)
             {

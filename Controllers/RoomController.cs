@@ -53,13 +53,14 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPost]
-        public ActionResult<RoomViewModel> CreateRoom([FromBody] Room room)
+        public ActionResult<RoomViewModel> CreateRoom([FromBody] RoomViewModel room)
         {
             if (ModelState.IsValid)
             {
-                _repo.CreateNewRoom(room);
+                Room r = _mapper.Map<Room>(room);
+                _repo.CreateNewRoom(r);
                 if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<RoomViewModel>(room));
+                return Ok(_mapper.Map<RoomViewModel>(r));
             }
             else
             {
@@ -68,14 +69,15 @@ namespace BookingSystem.Controllers
         }
 
         [HttpPut]
-        public ActionResult<RoomViewModel> UpdateRoom([FromBody] Room room)
+        public ActionResult<RoomViewModel> UpdateRoom([FromBody] RoomViewModel room)
         {
             try
             {
-                if (!_repo.UpdateRoom(room)) { return BadRequest(); }
+                Room r = _mapper.Map<Room>(room);
+                if (!_repo.UpdateRoom(r)) { return BadRequest(); }
 
                 if (!_repo.SaveAll()) { return BadRequest(); }
-                return Ok(_mapper.Map<RoomViewModel>(room));
+                return Ok(_mapper.Map<RoomViewModel>(r));
             }
             catch(ArgumentException ex)
             {
